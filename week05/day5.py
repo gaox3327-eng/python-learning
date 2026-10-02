@@ -1,43 +1,64 @@
+students = [
+    {"name": "张三", "age": 19, "score": 82},
+    {"name": "李四", "age": 20, "score": 91},
+    {"name": "王五", "age": 19, "score": 67},
+    {"name": "赵六", "age": 21, "score": 55},
+    {"name": "小明", "age": 20, "score": 96}
+]
+
 
 def get_total(students):
     total = 0
     for stu in students:
-        total+=stu["score"]
-    return total    
+        total += stu["score"]
+    return total
 
 
 def get_average(students):
     total = get_total(students)
-    average = total/len(students)
+    average = total / len(students)
     return average
+
 
 def get_max_student(students):
     max_student = students[0]
+
     for stu in students:
         if stu["score"] > max_student["score"]:
-            max_student = stu 
+            max_student = stu
+
     return max_student
-    
+
+
 def get_min_student(students):
     min_student = students[0]
+
     for stu in students:
         if stu["score"] < min_student["score"]:
             min_student = stu
-    return min_student     
+
+    return min_student
+
 
 def get_pass_count(students):
     count = 0
+
     for stu in students:
         if stu["score"] >= 60:
-            count+=1
+            count += 1
+
     return count
+
 
 def get_excellent_count(students):
     count = 0
+
     for stu in students:
         if stu["score"] >= 90:
-            count+=1
-    return count        
+            count += 1
+
+    return count
+
 
 print("========== 学生成绩分析 ==========")
 
