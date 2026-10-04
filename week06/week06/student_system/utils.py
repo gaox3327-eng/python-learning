@@ -31,7 +31,12 @@ def input_name():
 def input_age(message):
     while True:
         try:
-            value = int(input(message))
-            return value
+            age = int(input(message))
+
+            if  1<=age<=100:
+                return age
+            
+            print("年龄必须在1-100之间")
+            
         except ValueError:
             print("请输入数字")
