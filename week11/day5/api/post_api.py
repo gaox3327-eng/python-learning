@@ -8,7 +8,7 @@ class PostApi:
 
     def get_post(self,post_id):
 
-        url = f"https://jsonplaceholder.typicode.com/posts/{post_id}"
+        url = f"/posts/{post_id}"
 
         response = self.client.get(url)
 
@@ -16,7 +16,7 @@ class PostApi:
 
     def create_post(self,data):
 
-        urI = "https://jsonplaceholder.typicode.com/posts"
+        urI = "/posts"
 
         response = self.client.post(
             urI,
