@@ -24,3 +24,10 @@ class PostApi:
         )
 
         return response
+    def delete_post(self,post_id):
+    
+            url = f"/posts/{post_id}"
+    
+            response = self.client.delete(url)
+    
+            return response
