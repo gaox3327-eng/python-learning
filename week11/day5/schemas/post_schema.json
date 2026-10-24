@@ -1,0 +1,13 @@
+{
+    "$schema":"https://json-schema.org/draft/2020-12/schema",
+    "title":"GET/posts/{id} 响应契约",
+    "typee":"objest",
+    "required":["userId","id","body","title"],
+    "properties":{
+        "userId":{"type":"integer","minimum":1},
+        "id":    {"type":"integer","minmun":1},
+        "body":  {"type":"string","minmun":1},
+        "title": {"type":"string","minmun":1}
+    },
+    "additionalProperties": false
+}

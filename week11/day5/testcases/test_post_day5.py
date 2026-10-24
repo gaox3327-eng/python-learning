@@ -2,6 +2,15 @@ import pytest
 
 from data.post_data import post_data
 
+import json
+from pathlib import Path
+from common.validators import assert_matches_schema
+
+SCHEMA_DIR = Path(__file__).resolve().parent.parent / "schemas"
+
+def load_schema(name):
+    return json.loads((SCHEMA_DIR / name).read_text(encoding="utf-8"))
+
 @pytest.mark.parametrize("post_id", [1, 2, 3])
 def test_get_post(post_api, post_id):
     response = post_api.get_post(post_id)
@@ -43,5 +52,10 @@ def test_get_post_invalid_id(post_api):
 def test_delete_not_found(post_api):
     response = post_api.delete_post(99999)
     assert response.status_code == 404
+
+def test_get_post_schema(post_api):
+    response = post_api.get_post(1)
+    assert response.status_code == 200
+    assert_matches_schema(response.json(), load_schema("post_schema.json"), "GET /posts/1")  
     
     
