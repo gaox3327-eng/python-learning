@@ -2,9 +2,9 @@ from common.api_client import ApiClient
 
 class PostApi:
 
-    def __init__(self):
-
-        self.client = ApiClient()
+    def __init__(self, client=None):
+        # 不传就自己造；传了就用传入的（依赖注入，方便测试与复用）
+        self.client = client or ApiClient()
 
     def get_post(self,post_id):
 

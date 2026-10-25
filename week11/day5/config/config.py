@@ -23,3 +23,5 @@ if ENV not in BASE_URLS:
     raise ValueError(f"未知的 ENV={ENV!r}，可选值：{list(BASE_URLS)}")
 
 BASE_URL = BASE_URLS[ENV]
+AUTH_TOKEN = os.getenv("AUTH_TOKEN", "my-test-token")
+AUTH_BASE_URL = "https://httpbin.org"
