@@ -1,38 +1,45 @@
 import pytest
 
 from api.post_api import PostApi
+from api.products_api import ProductsApi
 from common.api_client import ApiClient
 from common.auth import bearer
 from config.config import AUTH_TOKEN, AUTH_BASE_URL
 
+DUMMY_BASE = "https://dummyjson.com"
 
-# ---------------------------------------------------------------- 原有夹具
+
+# ---------------------------------------------------------------- 业务夹具
 @pytest.fixture
 def post_api():
-    """被测业务接口（jsonplaceholder，无需鉴权）。
-
-    注意：必须保留 —— test_post_day5.py 的 8 个用例全靠它。
-    """
+    """jsonplaceholder 业务接口（无需鉴权）。test_post_day5.py 的 8 个用例依赖它。"""
     return PostApi()
 
 
-# ---------------------------------------------------------------- 鉴权夹具
-def _refresh_credentials(client):
-    """凭据刷新。
+@pytest.fixture
+def dummy_client():
+    """指向 dummyjson 的底层客户端（无鉴权）。"""
+    return ApiClient(base_url=DUMMY_BASE)
 
-    真实项目里这里是：调登录接口 → 拿新 token → 写回 client.default_headers
-    现在用 httpbin 演示，token 从 .env 读。
-    """
+
+@pytest.fixture
+def products_api(dummy_client):
+    """dummyjson/products 的业务接口（注入底层客户端）。"""
+    return ProductsApi(client=dummy_client)
+
+
+# ---------------------------------------------------------------- 鉴权演示夹具
+def _refresh_credentials(client):
+    """凭据刷新：真实项目里是调登录接口拿新 token 后写回默认头。"""
     client.default_headers.update(bearer(AUTH_TOKEN))
 
 
 @pytest.fixture
 def auth_api():
-    """带鉴权 + 自动续期的客户端（httpbin）。
+    """带鉴权 + 401 自动续期的客户端（httpbin）。
 
-    目前用例未直接使用：PostApi 的方法（/posts/...）在 httpbin 上不存在。
-    保留它用于演示「依赖注入 + 401 自动续期」，
-    后续要为它单独写一组指向 httpbin 的业务方法，或在选做测试里用。
+    注意：test_auth.py 自己定义了 anon_client / bearer_client 两个本地夹具，
+    不依赖这里；本夹具仅用于演示依赖注入与续期机制。
     """
     client = ApiClient(base_url=AUTH_BASE_URL, on_unauthorized=_refresh_credentials)
     return PostApi(client=client)
