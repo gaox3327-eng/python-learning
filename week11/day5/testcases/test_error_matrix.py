@@ -60,18 +60,56 @@ def test_error_matrix(fast_client, case):
         f"响应前 80 字 {resp.text[:80]!r}"
     )
 
-    # ③ 格式：响应必须是 JSON（能区分「业务 404 的 JSON」和「路由 404 的 HTML」）
-    content_type = resp.headers.get("Content-Type", "")
-    assert "application/json" in content_type, (
-        f"{case['id']}: 期望 JSON，实际 Content-Type={content_type!r}"
+    # ③ 格式：由数据声明期望的 Content-Type（默认 JSON）
+    #    这样「业务 404 → JSON」和「路由 404 → HTML」都能被精确表达
+    expected_ct = case.get("expected_content_type", "application/json")
+    actual_ct = resp.headers.get("Content-Type", "")
+    assert expected_ct in actual_ct, (
+        f"{case['id']}: 期望 Content-Type 含 {expected_ct!r}，实际 {actual_ct!r}"
     )
 
-    # ④ 错误体结构：只对 4xx/5xx 生效
-    #    200 的响应体是业务数据（products 列表），没有 message —— 不能无条件断言
-    body = resp.json()
-    if resp.status_code >= 400:
-        assert isinstance(body.get("message"), str) and body["message"].strip(), (
-            f"{case['id']}: 错误体缺少非空 message，实际 {body}"
-        )
-    else:
-        assert body, f"{case['id']}: 成功响应体不应为空"
+    # ④ 体结构：只有 JSON 才做结构断言（HTML 错误页没有 JSON 体，不能硬套）
+    if "application/json" in actual_ct:
+        body = resp.json()
+        if resp.status_code >= 400:
+            assert isinstance(body.get("message"), str) and body["message"].strip(), (
+                f"{case['id']}: 错误体缺少非空 message，实际 {body}"
+            )
+        else:
+            assert body, f"{case['id']}: 成功响应体不应为空"
+
+
+#单独写「业务 404（JSON）」和「路由 404（HTML）」两条
+
+def test_business_404_returns_json(fast_client):
+    resp = fast_client.get("/products/99999")
+
+    assert resp.status_code == 404
+    assert "application/json" in resp.headers["Content-Type"]
+    assert "not found" in resp.json()["message"]
+
+
+def test_route_404_returns_html_today(fast_client):
+    """路由 404：路径不存在 → 框架默认 HTML 错误页。
+
+    这条**钉住现状**（绿色通过），用来说明两种 404 的区别。
+    实测：GET /productsx → 404 + text/html
+    """
+    resp = fast_client.get("/productsx")
+
+    assert resp.status_code == 404
+    assert "text/html" in resp.headers["Content-Type"]     # ← 就是这里不一样
+
+
+@pytest.mark.xfail(strict=True, reason="缺陷: 路由 404 返回 HTML，破坏 JSON 契约")
+def test_route_404_should_be_json(fast_client):
+    """同一位置，但按**契约**期望 JSON —— 所以它是缺陷（xfail）。
+
+    和上一条的区别：
+        上一条：记录"现在是什么"（绿）
+        这一条：坚持"应该是什么"（黄）
+    """
+    resp = fast_client.get("/productsx")
+
+    assert resp.status_code == 404
+    assert "application/json" in resp.headers["Content-Type"]

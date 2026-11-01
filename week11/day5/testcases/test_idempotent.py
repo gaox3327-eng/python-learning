@@ -12,6 +12,22 @@ from common.api_client import ApiClient
 BASE = "http://127.0.0.1:8002"
 
 
+def _idem_server_alive() -> bool:
+    """探测服务是否已启动（2 秒超时，不重试）。"""
+    try:
+        requests.get(BASE + "/accounts/1", timeout=2)
+        return True
+    except requests.RequestException:
+        return False
+
+
+# 服务没起就整组跳过 —— 而不是让 3 条用例报 ERROR（ERROR 会掩盖真正的问题）
+pytestmark = pytest.mark.skipif(
+    not _idem_server_alive(),
+    reason='idem_server 未启动，先运行：python "D:\\大肥鱼\\学习\\07-异常与容错\\idem_server.py" 8002',
+)
+
+
 @pytest.fixture
 def account():
     """每条用例前重置数据，保证隔离。"""

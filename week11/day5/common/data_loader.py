@@ -30,7 +30,7 @@ SECTION_REQUIRED = {
 # ── 每个 section 允许出现的字段（拼写保护：不在白名单里的键说明大概率拼错了）
 SECTION_ALLOWED = {
     "error_matrix":  {"id", "desc", "params", "path", "method",
-                      "expected_status", "known_defect"},
+                      "expected_status", "expected_content_type", "known_defect"},
     "invalid_limit": {"id", "desc", "params", "expected_status", "known_defect"},
     "invalid_order": {"id", "desc", "params", "expected_status", "known_defect"},
     "not_found_id":  {"id", "desc", "product_id", "expected_status", "known_defect"},
@@ -92,6 +92,11 @@ def _check_case(case, filename: str, section: str, index: int) -> None:
         raise ValueError(f"{where} 的 method 不是合法的 HTTP 方法：{case['method']!r}")
     if "known_defect" in case and not isinstance(case["known_defect"], bool):
         raise ValueError(f"{where} 的 known_defect 必须是 true/false，实际是 {case['known_defect']!r}")
+    if "expected_content_type" in case and not isinstance(case["expected_content_type"], str):
+        raise ValueError(
+            f"{where} 的 expected_content_type 必须是字符串（如 application/json），"
+            f"实际是 {case['expected_content_type']!r}"
+        )
 
 
 def load_cases(filename: str, section: str) -> list[dict]:
