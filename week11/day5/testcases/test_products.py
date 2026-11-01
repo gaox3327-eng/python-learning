@@ -1,5 +1,5 @@
 """独立作战测试：dummyjson.com/products
-
+limit = 本次查询，想要拿多少条。
 用例清单（10 个函数 / 20 个用例）：
     正向  1. 列表结构契约
           2. 分页 limit × 3
@@ -16,6 +16,9 @@
 import pytest
 
 from common.validators import assert_matches_schema
+
+from common.data_loader import load_cases
+
 
 # ---------------------------------------------------------------- 契约
 LIST_SCHEMA = {
@@ -47,6 +50,9 @@ ERROR_SCHEMA = {
     "additionalProperties": False,
 }
 
+
+INVALID_LIMIT = load_cases("products_cases.yaml", "invalid_limit")
+NOT_FOUND = load_cases("products_cases.yaml", "not_found_id")
 
 # ---------------------------------------------------------------- 正向
 def test_list_contract(products_api):
@@ -137,3 +143,18 @@ def test_search_no_result(products_api):
     data = resp.json()
     assert data["products"] == []
     assert data["total"] == 0
+
+@pytest.mark.parametrize(
+    "case",
+    INVALID_LIMIT,
+    ids=[c["id"] for c in INVALID_LIMIT],      # 用例名取自数据里的 id
+)
+def test_list_limit_invalid(products_api, case):
+    resp = products_api.list_products(**case["params"])
+    assert resp.status_code == case["expected_status"]
+
+
+@pytest.mark.parametrize("case", NOT_FOUND, ids=[c["id"] for c in NOT_FOUND])
+def test_get_product_not_found(products_api, case):
+    resp = products_api.get_product(case["product_id"])
+    assert resp.status_code == case["expected_status"]

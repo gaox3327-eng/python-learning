@@ -1,0 +1,36 @@
+# GET /products 的用例数据
+# 约定：每个 section 是一组同构用例，元素必须含 id / params / expected_status
+
+invalid_limit:                  #代表【limit 参数非法】这一组测试用例集合
+  - id: negative                #用例唯一标识，用来在代码里定位、打印日志、筛选用例，简短英文
+    desc: limit 为负数           #代表用例测试的什么场景
+    params: { limit: -5 }        #请求查询参数（GET `/products` 的 query 参数），是字典
+    expected_status: 400
+
+  - id: not-a-number
+    desc: limit 传字符串
+    params: { limit: "abc" }
+    expected_status: 400
+
+  - id: float
+    desc: limit 为小数（新增场景只需加这一段）
+    params: { limit: 0.5 }
+    expected_status: 200
+
+invalid_order:
+  - id: bad-value
+    desc: order 不是 asc/desc
+    params: { sortBy: price, order: hhh }
+    expected_status: 400
+
+not_found_id:
+  - id: zero
+    desc: id 为 0
+    product_id: 0
+    expected_status: 404
+
+  - id: huge
+    desc: id 不存在
+    product_id: 99999
+    expected_status: 404
+
