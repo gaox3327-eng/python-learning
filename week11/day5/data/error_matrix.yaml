@@ -1,0 +1,91 @@
+# 错误码矩阵：一条用例 = 一次请求 + 一个期望状态码
+#
+# 两类用例：
+#   1) 参数类：只有 params        → GET /products?<params>
+#   2) 路径/方法类：有 path       → <method> <path>?<params>
+#
+# known_defect: true 表示"期望值是正确行为，但接口目前不符合" → 用例标 xfail
+#
+# 实测备注（2026-11-01，dummyjson）：
+#   limit 没有上限校验：limit=101 → 200（101 条）；limit=195 → 200（194 条，取尽）
+#   路由不存在时返回 HTML 错误页（不是 JSON），而资源不存在返回 JSON
+
+error_matrix:
+  # ── 正常
+  - id: ok_normal
+    desc: 正常查询
+    params: { limit: 3 }
+    expected_status: 200
+
+  # ── 边界
+  - id: limit_boundary_one
+    desc: limit 为最小有效值
+    params: { limit: 1 }
+    expected_status: 200
+
+  - id: limit_max_valid
+    desc: limit 取较大值（接口无上限校验）
+    params: { limit: 100 }
+    expected_status: 200
+
+  # ── 越界
+  - id: limit-negative
+    desc: limit 为负数
+    params: { limit: -1 }
+    expected_status: 400
+
+  - id: skip-negative
+    desc: skip 为负数
+    params: { skip: -1 }
+    expected_status: 400
+
+  # ── 类型
+  - id: limit-not-number
+    desc: limit 传字符串
+    params: { limit: "abc" }
+    expected_status: 400
+
+  - id: order-invalid
+    desc: order 不是 asc/desc
+    params: { sortBy: price, order: hhh }
+    expected_status: 400
+
+  # ── 已知缺陷 1：limit=0 被当作"不限制"
+  - id: limit-zero
+    desc: "缺陷: limit=0 被当作不限制，返回全部而非 400"
+    params: { limit: 0 }
+    expected_status: 400
+    known_defect: true
+
+  # ── 已知缺陷 2：limit 传小数被静默取整
+  - id: limit-float
+    desc: "缺陷: limit=0.5 被当作 0，返回全部而非 400"
+    params: { limit: 0.5 }
+    expected_status: 400
+    known_defect: true
+
+  # ── 资源不存在（业务 404：JSON）
+  - id: resource_not_exist
+    desc: 查询不存在的商品 id（路径参数）
+    path: /products/99999
+    expected_status: 404
+
+  - id: product_id_not_number
+    desc: 商品 id 不是数字
+    path: /products/abc
+    expected_status: 404
+
+  # ── 已知缺陷 3：方法不匹配时返回 404 + HTML（应为 405 或 JSON）
+  - id: wrong_http_method
+    desc: "缺陷: 对 /products 用 PUT，返回 404+HTML 而非 405"
+    method: PUT
+    path: /products
+    expected_status: 405
+    known_defect: true
+
+  # ── 已知缺陷 4：路径不存在返回 404 + HTML（状态对，格式契约破坏）
+  - id: wrong_path
+    desc: "缺陷: 访问不存在的路径返回 HTML 错误页，破坏 JSON 契约"
+    path: /productsx
+    expected_status: 404
+    known_defect: true
