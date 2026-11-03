@@ -1,5 +1,7 @@
 """第 7 课 Day 1：重试行为验证（不依赖网络，用 monkeypatch 造假响应）"""
 
+import pytest
+
 import common.api_client as mod
 
 
@@ -42,3 +44,6 @@ def test_post_is_not_retried(monkeypatch):
     assert resp.status_code == 500
     assert len(calls) == 1
     assert resp.retry_count == 0
+
+# 第 1 课重试：不碰网络，0.04 秒
+pytestmark = pytest.mark.smoke

@@ -89,3 +89,7 @@ def test_amount_has_no_float_error(shop):
     total = shop.post("/orders", data={"product_id": 4, "qty": 3}).json()["total"]
 
     assert total == 0.3, f"0.1×3 应等于 0.3，实际 {total!r}"
+
+
+# 第 8 课 6 条缺陷：本地服务，0.3 秒
+pytestmark = pytest.mark.smoke
