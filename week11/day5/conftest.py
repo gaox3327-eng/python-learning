@@ -2,6 +2,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+import yaml
 
 import pytest
 import requests
@@ -12,6 +13,10 @@ from common.api_client import ApiClient
 from common.auth import bearer
 from config.config import AUTH_TOKEN, AUTH_BASE_URL
 
+
+from api.booking_api import BASE as BOOKING_BASE
+from api.booking_api import bookingApi
+from common.api_client import ApiClient
 ROOT = Path(__file__).resolve().parent
 DUMMY_BASE = "https://dummyjson.com"
 MOCK_URL = "http://127.0.0.1:8001"
@@ -98,3 +103,17 @@ def shop(mock_server):
     """每条用例前重置数据，保证互相隔离；短超时（本地服务，慢就是真有问题）。"""
     requests.post(mock_server + "/reset", timeout=5)
     return ApiClient(base_url=mock_server, timeout=5, retries=0)
+
+@pytest.fixture(scope="function")
+def booking_client():
+    # 直接从 booking_api 拿 BASE，不再读config
+    return ApiClient(base_url=BOOKING_BASE)
+
+@pytest.fixture(scope="function")
+def booking_api(booking_client):
+    return bookingApi(client=booking_client)
+def load_yaml_file(file_path):
+    """读取yaml文件，普通函数，哪里想用直接调用"""
+    with open(file_path, encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    return data

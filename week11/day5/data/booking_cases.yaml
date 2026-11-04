@@ -1,0 +1,16 @@
+create_happy:
+  firstname: "Alice"
+  lastname: "Zhang"
+  totalprice: 450
+  depositpaid: true
+  checkin: "2026-12-01"
+  checkout: "2026-12-05"
+  additionalneeds: "Breakfast"
+
+create_missing_lastname:
+  firstname: "Bob"
+  totalprice: 200
+  depositpaid: false
+  checkin: "2026-12-02"
+  checkout: "2026-12-04"
+  additionalneeds: ""
