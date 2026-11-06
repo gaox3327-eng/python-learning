@@ -17,6 +17,8 @@ from config.config import AUTH_TOKEN, AUTH_BASE_URL
 from api.booking_api import BASE as BOOKING_BASE
 from api.booking_api import bookingApi
 from common.api_client import ApiClient
+from common.db_utils import connect as db_connect
+
 ROOT = Path(__file__).resolve().parent
 DUMMY_BASE = "https://dummyjson.com"
 MOCK_URL = "http://127.0.0.1:8001"
@@ -117,3 +119,21 @@ def load_yaml_file(file_path):
     with open(file_path, encoding="utf-8") as f:
         data = yaml.safe_load(f)
     return data
+
+# ---------------------------------------------------------------- 第 12 课：接口 + 数据库
+DB_API_URL = "http://127.0.0.1:8010"
+
+
+@pytest.fixture
+def db():
+    """一个用例一个 MySQL 连接。"""
+    conn = db_connect()
+    yield conn
+    conn.close()
+
+
+@pytest.fixture
+def db_api():
+    """指向 db_app.py(8010) 的客户端；每条用例前重置数据。"""
+    requests.post(DB_API_URL + "/reset", timeout=5)
+    return ApiClient(base_url=DB_API_URL, timeout=5, retries=0)
