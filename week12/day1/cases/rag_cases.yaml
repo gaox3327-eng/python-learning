@@ -1,0 +1,54 @@
+# 第 17 课：RAG 评测集（10 条）
+# gold_doc：标准答案应来自哪篇文档（检索金标准）
+# expect_contains：答案必须出现的事实锚点
+
+rag_cases:
+  - id: R01_refund_time
+    query: 退款要多久才能到账？
+    gold_doc: doc_refund_time
+    expect_contains: ["1-3", "工作日"]
+
+  - id: R02_refund_over
+    query: 能退的金额超过订单总额吗？
+    gold_doc: doc_refund_rule
+    expect_contains: ["不得超过", "订单总额"]
+
+  - id: R03_shipping
+    query: 多少金额免运费？
+    gold_doc: doc_shipping
+    expect_contains: ["99"]
+
+  - id: R04_invoice
+    query: 发票什么时候能收到？
+    gold_doc: doc_invoice
+    expect_contains: ["24", "邮箱"]
+
+  - id: R05_stock
+    query: 库存什么时候扣减？
+    gold_doc: doc_stock
+    expect_contains: ["下单"]
+
+  - id: R06_member
+    query: 会员积分怎么算？
+    gold_doc: doc_member
+    expect_contains: ["1%"]
+
+  - id: R07_delivery
+    query: 用什么快递配送？
+    gold_doc: doc_delivery
+    expect_contains: ["顺丰"]
+
+  - id: R08_return
+    query: 签收后几天内可以退货？
+    gold_doc: doc_return
+    expect_contains: ["7"]
+
+  - id: R09_refund_time2
+    query: 退款到账时间取决于银行吗？
+    gold_doc: doc_refund_time
+    expect_contains: ["银行"]
+
+  - id: R10_shipping_min
+    query: 不满99元运费多少？
+    gold_doc: doc_shipping
+    expect_contains: ["10"]

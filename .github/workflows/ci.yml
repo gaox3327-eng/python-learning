@@ -56,12 +56,13 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: AI 评测（LLM 输出 + Agent 轨迹）
-        run: pytest -m "agent or llm" --junitxml=junit-ai.xml
+        run: pytest -m "agent or llm or rag" --junitxml=junit-ai.xml
 
       - name: 生成评测报告
         run: |
           python scripts/llm_report.py
           python scripts/agent_report.py
+          python scripts/rag_report.py
 
       - name: 上传评测报告
         if: always()
@@ -71,3 +72,4 @@ jobs:
           path: |
             week12/day1/reports/llm_report.md
             week12/day1/reports/agent_report.md
+            week12/day1/reports/rag_report.md
