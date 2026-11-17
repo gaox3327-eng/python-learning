@@ -10,6 +10,23 @@
 > 当前引擎是**本地替身**（`ai_evals/llm.py`、`ai_evals/agent.py`），
 > 无需 API key 即可复现全部结果；接真实模型时只改这两个文件的 `ask()` / `run()`。
 
+## 指标总览
+
+![指标总览](../../docs/指标总览.png)
+
+## 测试与覆盖率
+
+```bash
+pytest                                     # 23 passed, 1 xfailed（约 0.3 秒）
+pytest --cov=ai_evals --cov-report=term    # 覆盖率 76%（agent 81% / llm 69%）
+```
+
+| 模块 | 覆盖率 |
+|---|---|
+| `ai_evals/agent.py` | 81% |
+| `ai_evals/llm.py` | 69% |
+| **合计** | **76%** |
+
 ## 快速开始
 
 ```bash
