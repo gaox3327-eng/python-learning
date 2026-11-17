@@ -2,3 +2,7 @@ reports/
 *.html
 __pycache__/
 .pytest_cache/
+# 覆盖率数据
+.coverage
+coverage.xml
+htmlcov/

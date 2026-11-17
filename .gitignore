@@ -10,3 +10,8 @@ __pycache__/
 .pytest_cache/
 .venv/
 venv/
+# 覆盖率数据
+.coverage
+coverage.xml
+htmlcov/
+**/.coverage
